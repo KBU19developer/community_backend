@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>사진 업로드 페이지</title>
+	<script>
+		function uploadPhoto() {
+			// HTML form 엘리먼트 가져오기
+			var form = document.getElementById("upload-form");
+			// FormData 객체 생성
+			var formData = new FormData(form);
+			
+			// HTTP POST 요청 보내기
+			var request = new XMLHttpRequest();
+			request.open("POST", "/upload", true);
+			request.send(formData);
+			
+			// 서버 응답 처리
+			request.onreadystatechange = function() {
+				if (request.readyState === XMLHttpRequest.DONE) {
+					if (request.status === 200) {
+						alert("사진 업로드가 완료되었습니다.");
+					} else {
+						alert("서버와의 통신 중 오류가 발생했습니다.");
+					}
+				}
+			};
+		}
+	</script>
+</head>
+<body>
+	<h1>사진 업로드 페이지</h1>
+	<p>아래는 사진을 업로드할 수 있는 폼입니다.</p>
+	
+	<form id="upload-form">
+		<label for="photo-input">사진 파일 선택:</label>
+		<input type="file" id="photo-input" name="photo">
+		<br>
+		<input type="button" value="업로드" onclick="uploadPhoto()">
+	</form>
+</body>
+</html>

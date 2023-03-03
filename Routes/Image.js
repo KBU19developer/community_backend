@@ -15,7 +15,7 @@ const storage = multer.diskStorage({destination: (req,file,cb) => { cb(null, pat
 router.post('/', upload.single('ImgFile'), function(req,res){ // when receieved image file
     console.log(req.file);
     console.log(req.file.filename);
-    res.send({'response' : 'ok', 'UUID' : v4(), 'path' : Hashing.Hash(storage)});
+    res.send({'response' : 'ok', 'UUID' : v4(), 'path' : Hashing.Hash(storage)}); //file path, uuid
 });
 
 //test html render 

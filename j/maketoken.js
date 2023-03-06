@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
  // Access Token 발행 함수
 function generateAccessToken(userId) {
-    const accessToken = jwt.sign({ Id: userId }, 'accesstoken', { expiresIn: '5m' });
+    const accessToken = jwt.sign({ Id: userId }, 'accesstoken', { expiresIn: '1m' });
     return accessToken;
   }
   
@@ -15,25 +15,26 @@ function generateAccessToken(userId) {
     return refreshToken;
   }
   //Access Token 디코딩해서 판별하는 함수
-  function verifyAccessToken(req, res) {
+  function verifyAccessToken(req, res,next) {
     
     const accessToken = req.cookies.accessToken;
     if (!accessToken) {
-      return res.status(401).redirect('/login');//post 방식으로 받았기 때문에 redirect로 처리
+      return res.status(401).json({ message: 'Access Token not found' });//post 방식으로 받았기 때문에 redirect로 처리
     }
   
-    const userId =jwt.verify(accessToken, 'accesstoken', (err, decoded) => {
+     jwt.verify(accessToken, 'accesstoken', (err, decoded) => {
       if (err) {
-        return res.status(403).redirect('/login');
+        return res.status(403).json({ message: 'Access Token is not valid' });
       }
-      return decoded.Id;
+      req.userId =decoded.Id;
+      next();
     })
     
-    return userId;
   }
   //Refresh Token 디코딩 해서 판별하는 함수
   function verifyRefreshToken(req, res, next) {
     const refreshToken = req.cookies.refreshToken;
+    console.log("환아 힘내");
     if (!refreshToken) {
       return res.status(401).json({ message: 'Refresh Token not found' });
     }
@@ -42,17 +43,14 @@ function generateAccessToken(userId) {
       if (err) {
         return res.status(403).json({ message: 'Refresh Token is not valid' });
       }
-  
       const userId = decoded.Id;
-      const accessToken = jwt.sign({ Id: userId }, 'accesstoken', { expiresIn: '5m' });
-      const newRefreshToken = jwt.sign({ Id: userId }, 'refreshtoken', { expiresIn: '24h' });
-  
-      res.cookie('refreshToken', newRefreshToken, { secure: false ,httpOnly: true });
-      res.cookie('accessToken', accessToken, { secure: false ,httpOnly: true });
-      req.userId = userId;
-      req.accessToken = accessToken;
-      req.newRefreshToken = newRefreshToken;
-      next();
+      const accessToken = generateAccessToken(userId);
+      const refreshToken =generateRefreshToken(userId);
+    req.Id = userId;
+    req.accessToken = accessToken;
+    req.refreshToken = refreshToken;
+    next();
+      
     });
   }
   

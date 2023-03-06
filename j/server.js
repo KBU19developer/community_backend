@@ -30,7 +30,7 @@ app.post("/login", (req, res) => {
         console.log('아이디 [%s], 아이디가 일치x', id)
         res.send({'f' : 'fail'});
         res.end();
-        return;
+        
     }
 
     else if(rows.length > 0 ){
@@ -75,15 +75,16 @@ app.post("/login", (req, res) => {
     .catch((err)=> {
         res.send({'f':'fail'});
         console.log(err);
+        
     });   
 });
-app.get('/accesstoken', (req, res) => {
-    const userId = token.vat(req, res);
+app.get('/accesstoken', token.vat ,(req, res) => {
+    const userId = req.userId;
     if (userId) {
       sql.check(userId)
         .then((rows)=>{
           if(rows[0].id == userId) {
-            console.log(userId);
+            
             res.json({message: userId});
           } else {
             res.json({message : "fail"});
@@ -93,14 +94,17 @@ app.get('/accesstoken', (req, res) => {
           res.json({message : "fail"});
         });
     } else {
-      res.status(401).redirect('/login');
+      res.status(401).json('fail');
     }
   });
 app.get('/refreshtoken',token.vrt, (req,res) =>
 {
-    const accessToken =req.accessToken;
-    const refreshToken = req.newRefreshToken;
-    res.json({accessToken,refreshToken});
+  const refreshToken = req.refreshToken;
+  const accessToken = req.accessToken;
+  console.log(refreshToken,accessToken);
+  res.cookie('refreshToken', refreshToken, { secure: false });
+  res.cookie('accessToken', accessToken, { secure: false });
+  res.status(200).json({accessToken, refreshToken});
 });
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, './frontend/build/index.html'));
@@ -109,7 +113,6 @@ app.post('/logout', (req, res) => {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.status(200).send('Logged out');
-    console.log(req.cookies);
   });
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './frontend/build/index.html'));

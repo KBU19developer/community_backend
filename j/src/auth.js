@@ -6,20 +6,24 @@ import Logout from './logout';
 
 function useAccessToken() {
   const navigate = useNavigate();
-  const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken']);
+  const [cookies, setCookie] = useCookies(['accessToken', 'refreshToken']);
+  const accessTokenExpTime = 60 * 1000;
+  const refreshTokenExpTime = 24 * 60* 60* 1000;
 
-  const getAccessTokenAPI =  (accessToken) => {
+  const AccessTokenAPI =  (accessToken) => {
     axios({
       url: "http://localhost:3001/accesstoken",
       method: "GET",
       withCredentials: true,
+      headers: {
       Authorization: `Bearer ${accessToken}`
+      }
     })
     .then(res => {
-      setCookies('accessToken',accessToken);
+      setCookie('accessToken', accessToken, { maxAge: accessTokenExpTime });
     })
     .catch(error => {
-      console.log(error);
+      refreshTokenAPI(cookies.refreshToken);
     });
   };
 
@@ -27,18 +31,21 @@ function useAccessToken() {
     axios({
       url: "http://localhost:3001/refreshtoken",
       method: "GET",
-      withCredentials: true
-      
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${refreshToken}`
+      }
     })
     .then(res => {
-      const { access_token, refresh_token } = res.data;
-      console.log(res.data);
-      setCookies('accessToken', access_token);
-      setCookies('refreshToken', refresh_token);
-      getAccessTokenAPI(access_token);
+      const { accessToken, refreshToken } = res.data;
+      console.log(accessToken,refreshToken);
+      setCookie('accessToken', accessToken, { maxAge: accessTokenExpTime });
+      setCookie('refreshToken', refreshToken, { maxAge: refreshTokenExpTime });
+      AccessTokenAPI(accessToken);
     })
     .catch(error => {
       console.log(error);
+      navigate('/logout');
     });
   };
 
@@ -52,7 +59,7 @@ function useAccessToken() {
       }
     else if (accessToken) {
       console.log("hi");
-      getAccessTokenAPI(accessToken);
+      AccessTokenAPI(accessToken);
     }
     else if (refreshToken){
       console.log("hello");
@@ -62,7 +69,8 @@ function useAccessToken() {
       alert("why?");
     }
     
-  }, [cookies.accessToken, cookies.refreshToken, cookies, navigate, setCookies]);
+  }, [cookies.accessToken, cookies.refreshToken, cookies, navigate, setCookie]);
+  return cookies.accessToken;
 }
 
 export default useAccessToken;

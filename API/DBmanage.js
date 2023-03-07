@@ -1,4 +1,4 @@
-const model = require('../models'); // You need to have models in your Disk
+const model = require('../DB/DBmanagement/models'); // You need to have models in your Disk
 
 function Insert(table, value) { // You need to match column names in DB and value
     return model[table].create(value);
@@ -14,4 +14,19 @@ function SelectAll(table){
     return model[table].findAll();
 }
 
-module.exports = {Insert : Insert, SelectWhere : SelectWhere, Select : SelectAll};
+function SelectOffset(table, index, row){
+    return model[table].findAll({
+        attributes : row,
+        offset : index*5 - 5,
+        limit : index*5
+    });
+}
+
+function CheckID(table, value, row){
+    return model[table].findAll({
+        attributes : row,
+        where : value
+    });
+}
+
+module.exports = {Insert : Insert, SelectWhere : SelectWhere, Select : SelectAll, SelectLimit : SelectOffset, Check : CheckID};

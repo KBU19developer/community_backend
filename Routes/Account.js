@@ -13,10 +13,9 @@ router.post('/', (req, res) => {
         return req.body;
     })
     .then((value) => {
-        console.log(value);
         DB.Insert('user', value)
-        .then((result) => res.send({"response" : "error"})) 
-        .catch((err) => res.send({"response" : "Well Done!"})); 
+        .then((result) => res.send({"response" : "Well Done!"})) 
+        .catch((err) => res.send({"response" : "error"})); 
     })
 });
 
@@ -24,6 +23,7 @@ router.post('/Check', function(req, res){ // The Checking ID
     DB.SelectWhere('user', req.body)
     .then((result) => {
         if(result.length == 0){
+            console.log(result);
             res.send({"response" : true});
         }
         else{
@@ -37,6 +37,7 @@ router.post('/CheckNick', function(req, res){ // The Checking NickName
     DB.SelectWhere('user', req.body)
     .then((result) => {
         if(result.length == 0){
+            console.log(result);
             res.send({"response" : true});
         }
         else{

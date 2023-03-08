@@ -64,10 +64,9 @@ router.post("/", (req, res) => {
 router.get('/accesstoken', token.vat ,(req, res) => {
     const userId = req.userId;
     if (userId) {
-      DB.Check('user',{ user_id : userId }, ['user_id','user_password','salt_key'])                    ////////////////////////////////////////////////////
+      DB.Check('user',{ user_id : userId }, ['user_id','user_password','salt_key'])
         .then((rows)=>{
           if(rows[0].user_id == userId) {
-            
             res.json({message: userId});
           } else {
             res.json({message : "fail"});
@@ -89,10 +88,8 @@ router.get('/refreshtoken',token.vrt, (req,res) =>
   res.cookie('accessToken', accessToken, { secure: false });
   res.status(200).json({accessToken, refreshToken});
 });
-/* router.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, './frontend/build/index.html'));
-});*/
-router.post('/logout', (req, res) => {
+
+router.post('/logout', (req, res) => { 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.status(200).send('Logged out');

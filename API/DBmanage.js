@@ -18,7 +18,7 @@ function SelectOffset(table, index, row){
     return model[table].findAll({
         attributes : row,
         offset : index*5 - 5,
-        limit : index*5
+        limit : 5
     });
 }
 

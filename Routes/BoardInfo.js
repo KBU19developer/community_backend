@@ -13,7 +13,6 @@ router.get("/postnum/:num", (req, res) => {
 router.get("/index/:id", (req, res) => { // if you want to use parameter in URI use :(any names you want to use)
     DB.SelectLimit('post', req.params.id, ['title', 'num'])
     .then((result) => {
-        console.log(result)
         res.send(result);
     })
     .catch(err => {

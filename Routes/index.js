@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const cookie = require('../Fortest/testToken');
 
 router.use(express.static(path.join(__dirname, '../../frontend/build'))); // To use Static file in this path
 
